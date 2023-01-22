@@ -1,6 +1,6 @@
 <script setup>
 
-import QuestionsPage from './components/QuestionsPage.vue'
+import QuestionsPage from './components/PickQuestionsPage.vue'
 import MainMenuPage from './components/MainMenuPage.vue'
 import { ref } from 'vue'
 
@@ -20,6 +20,7 @@ import { ref } from 'vue'
 <script>
 
 import {io} from "socket.io-client";
+import {router} from "@/router";
 
 const count = ref(0)
 
@@ -40,8 +41,6 @@ export default {
 
     startRound(){
 
-      
-
     }
 
   },
@@ -51,10 +50,14 @@ export default {
 
       socket: {},  // объект доступа к сокету
       code : "____",   // код присоединения к игре
-      is_connected: false, // подсоединен ли соект
-      players: [], // список игроков в нашей группе
+      is_connected: false, // подсоединен ли сокет
 
-      questions: [],
+      players: [], // список игроков в нашей группе
+      leading: false,
+      round: 0,
+
+      current_question: "____"
+
     }
   },
 
@@ -91,17 +94,43 @@ export default {
     // Обрабатываем ответ с игрой от сервера
     this.socket.on('client/game_updated', function (received_data) {
 
+      console.log("APP:SOCKET client/game_updated")
+
       // запоминаем код и игроков
       self.setCode(received_data.code)
       self.setPlayers(received_data.players)
 
-      console.log("APP:client/game_updated")
+
       console.log(received_data)
 
       self.$forceUpdate();
 
+      //  как только набралось два игрока – начинаем играть
+
+      if (self.players.length == 2) {
+
+        if (self.leading) {
+          router.push('/pickquestion');
+        } else {
+          router.push('/waitforpick');
+        }
+
+        console.log("APP: 2 players detected, game starts")
+
+      }
+
     });
 
+    this.socket.on('client/receive_question', function (received_data){
+
+      console.log("APP:SOCKET client/receive_question", received_data)
+
+      self.current_question = received_data.text
+
+      router.push("answerquestion")
+      self.round ++
+
+    })
 
   },
 

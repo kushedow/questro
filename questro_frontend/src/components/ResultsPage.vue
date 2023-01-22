@@ -34,5 +34,4 @@ export default {
     .btn-link
       color: #000
 
-
 </style>

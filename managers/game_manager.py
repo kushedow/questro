@@ -12,7 +12,7 @@ class GameManager:
         self.max_pk = 1
 
     def start_game(self) -> GameSession:
-        """Стартует игру и возвращает ее"""
+        """Стартует игру и возвращает ееd"""
 
         game: GameSession = GameSession(self.max_pk)
         self.active_games[self.max_pk] = game
@@ -48,6 +48,11 @@ class GameManager:
         player.game = game
 
         return game
+
+    # def get_next_player(self, player: Player) -> Player:
+    #
+    #     game: GameSession = player.game
+
 
     def remove_player_from_game(self, player: Player, game: GameSession):
         """ Отвязывает игру от пользователя, а пользователя от игры"""

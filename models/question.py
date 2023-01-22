@@ -8,7 +8,7 @@ class Question:
     """
     pk: int
     text: str
-    score: int
+    points: int
     used: bool = False
 
     def mark_used(self):
@@ -18,7 +18,7 @@ class Question:
         result = {
             "pk": self.pk,
             "text": self.text,
-            "score": self.score,
+            "points": self.points,
             "used": self.used,
         }
 

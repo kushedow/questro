@@ -36,12 +36,15 @@ export default {
       this.socket.emit("server/join_game", {code: parseInt(this.code)})
       console.log("APP: отправляем запрос на присоедниение к игре", this.code)
     }
-
   },
 
   mounted() {
 
+    // обозначаем, что в игре мы отвечаем вторыми
+    this.$root.$data.leading = false
 
+    // сбрасываем счетчик раундов
+    this.$root.$data.round = 0
 
   },
 

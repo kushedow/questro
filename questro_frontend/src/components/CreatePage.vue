@@ -14,8 +14,6 @@
 
     router-link(to="/play", v-if="players.length==2").btn.btn-dark.btn-lg Начать
 
-
-
 </template>
 
 <script>
@@ -40,7 +38,16 @@ export default {
 
   mounted() {
     console.log("APP: отправляем запрос над создание игры")
+
+    // отправляем запрос на создание игры
     this.socket.emit("server/create_game", {})
+
+    // обозначаем, что в игре мы отвечаем первыми
+    this.$root.$data.leading = true
+
+    // сбрасываем счетчик раундов на 0
+    this.$root.$data.round = 0
+
   },
 
 }

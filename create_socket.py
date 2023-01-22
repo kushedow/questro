@@ -9,3 +9,4 @@ app = socketio.WSGIApp(sio, static_files={
         '/main.js': {'content_type': 'text/javascript', 'filename': 'static/scripts/main.js'}
     },
 )
+

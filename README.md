@@ -8,8 +8,6 @@
 
 ### Принимает сообщения
 
----
-
 ```server/create_game``` запрос на создание игры
 
 ```server/join_game {"code"=1234}``` запрос на подключение к игре
@@ -28,7 +26,7 @@
 
 ```client/game_updated``` когда пришли новые данные по игре
 
-```client/client/game_started``` когда начинается игра
+```client/game_started``` когда начинается игра
 
 ```client/answer_recorded``` когда ответ принят сервером
 

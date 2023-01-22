@@ -2,7 +2,7 @@ from managers.game_manager import GameManager, GameSession
 from managers.player_manager import PlayerManager
 from managers.question_manager import QuestionManager, Question
 
-from config import QUESTION_SOURCE
+from config.config import QUESTION_SOURCE
 from models.player import Player
 
 
@@ -41,10 +41,8 @@ class QuestroMainService:
         """ Присоединяет игрока к игре по коду, возвращает игру"""
 
         player = cls.player_manager.get_player_by_pk(player_sid)
-        print(player)
 
         game = cls.game_manager.get_by_code(code)
-        print(game)
 
         if not game:
             return None
@@ -67,6 +65,13 @@ class QuestroMainService:
         """ Дает игроку вопрос """
         question: Question = cls.question_manager.get_random()
         return question
+
+    @classmethod
+    def get_three_questions(cls, game, player) -> list[Question]:
+        """ Возвращает три вопросика"""
+        questions: list[Question] = cls.question_manager.get_random_three()
+        return questions
+
 
     @classmethod
     def get_question_by_pk(cls, pk) -> Question:
@@ -98,5 +103,13 @@ class QuestroMainService:
             "active_players": repr(cls.player_manager.players),
             "questions": repr(cls.question_manager.questions),
         }
+
+    @classmethod
+    def get_next_player(cls, game: GameSession, player: Player):
+        """Получает следующего игрока в игре"""
+
+        next_player = game.get_next_player(player)
+
+        return next_player
 
 
