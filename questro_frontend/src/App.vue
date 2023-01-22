@@ -23,6 +23,7 @@ import {io} from "socket.io-client";
 import {router} from "@/router";
 
 const count = ref(0)
+const socket_server_url = "ws://188.68.222.147:5001"
 
 export default {
 
@@ -67,7 +68,7 @@ export default {
     const self = this
 
     // Создаем сокет
-    this.socket = io("ws://0.0.0.0:5001/");
+    this.socket = io(socket_server_url);
 
     // Присоединились
     this.socket.on("connect", () => {
