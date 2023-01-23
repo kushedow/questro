@@ -28,7 +28,11 @@ class QuestionManager:
             print("Ошибка загрузки")
             questions_raw = []
 
-        self.questions = [Question(**quest) for quest in questions_raw]
+        self.questions = [
+            Question(pk=q["pk"], text=q["text"], points=q["points"])
+            for q
+            in questions_raw
+        ]
 
         storage_logger.error(f"STORAGE   Данные загружены")
 
