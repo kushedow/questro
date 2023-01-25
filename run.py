@@ -186,5 +186,5 @@ def socket_exception(sid: str, error: str, broadcast=False):
 
 if __name__ == '__main__':
     eventlet.wsgi.server(
-        eventlet.listen(('', 5001)), app
+        eventlet.listen(('', 80)), app
     )
