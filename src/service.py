@@ -1,9 +1,10 @@
-from managers.game_manager import GameManager, GameSession
-from managers.player_manager import PlayerManager
-from managers.question_manager import QuestionManager, Question
-
 from config.config import QUESTION_SOURCE
+from managers.game_manager import GameManager
+from managers.player_manager import PlayerManager
+from managers.question_manager import QuestionManager
+from models.game_session import GameSession
 from models.player import Player
+from models.question import Question
 
 
 class QuestroMainService:
@@ -111,5 +112,3 @@ class QuestroMainService:
         next_player = game.get_next_player(player)
 
         return next_player
-
-

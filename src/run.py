@@ -1,18 +1,17 @@
 import eventlet
 
 import logging
-import config.logger
 
-from managers.game_manager import GameSession
-from managers.player_manager import Player
-from models.question import Question
+from src.models.game_session import GameSession
+from src.models.player import Player
+from src.models.question import Question
 
-from service import QuestroMainService as service
+from src.service import QuestroMainService as service
 
 # Выносим в отдельный файл создание сокета,
 # чтобы иметь возможность разделить контроллер на несколько
 
-from create_socket import sio, app
+from src.create_socket import sio, app
 
 # Активируем логгер для сокета
 socket_logger = logging.getLogger("socket")
@@ -183,8 +182,11 @@ def socket_exception(sid: str, error: str, broadcast=False):
         for player_to_inform in all_players:
             sio.emit("client/exception", to=player_to_inform, data={"error": error})
 
-
-if __name__ == '__main__':
+def main():
     eventlet.wsgi.server(
         eventlet.listen(('', 80)), app
     )
+
+
+if __name__ == '__main__':
+    main()

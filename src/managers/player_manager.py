@@ -2,7 +2,6 @@ from models.player import Player
 
 
 class PlayerManager:
-
     """Управляет активнымиигроками – создает, возвращает, удаляет """
 
     def __init__(self):
