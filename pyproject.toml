@@ -10,6 +10,7 @@ readme = "README.md"
 python = "^3.11"
 eventlet = "^0.33.3"
 python-socketio = "*"
+deprecation = "^2.1.0"
 
 [tool.poetry.scripts]
 run = "src.run:main"

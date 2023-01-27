@@ -1,3 +1,4 @@
+from managers.question_manager import QuestionManager
 from models.game_session import GameSession
 from models.player import Player
 
@@ -6,20 +7,35 @@ class GameManager:
 
     """ Управляет игровыми сессиями (играми) – создает, стартует, удаляет."""
 
-    def __init__(self):
+    def __init__(self,question_manager=None):
         # тут мы храним все активные игры, ключ – это pk
         self.active_games: dict[int:GameSession] = {}
         self.max_pk = 1
+        self.questions_manager: QuestionManager = question_manager
 
-    def start_game(self) -> GameSession:
-        """Стартует игру и возвращает ееd"""
+    def start_game(self, cat="default") -> GameSession:
 
-        game: GameSession = GameSession(self.max_pk)
-        self.active_games[self.max_pk] = game
+        """Стартует игру и возвращает ее"""
+
+        game: GameSession = GameSession(
+            pk=self.max_pk,
+            questions_cat=cat
+        )
+
+        # Догружаем вопросы в игру
+
+        questions = self.questions_manager.get_by_category(cat=cat)
+        game.add_questions(questions)
+
+        print()
 
         # Пишем в общий список и инкрементируем pk
+
+        self.active_games[self.max_pk] = game
         self.max_pk += 1
         return game
+
+
 
     def terminate_by_pk(self, pk: int):
         """ Убиваем игру по ключу """
@@ -32,7 +48,6 @@ class GameManager:
 
     def get_by_code(self, code: int) -> GameSession | None:
         """ Возвращаем игру по ее коду """
-        print(code)
         for game in self.active_games.values():
             if game.code == code:
                 return game
