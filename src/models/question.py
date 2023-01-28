@@ -7,9 +7,12 @@ class Question:
     Класс для хранения вопросов
     """
     pk: int
+
     text: str
-    points: int
+    points: int = 0  # баллы DEPRECATED
     used: bool = False
+
+    cat: str = "default"  # категория
 
     def mark_used(self):
         self.used = True
@@ -20,6 +23,7 @@ class Question:
             "text": self.text,
             "points": self.points,
             "used": self.used,
+            "cat": self.cat,
         }
 
         return result

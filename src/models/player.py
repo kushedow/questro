@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from models.game_session import GameSession
-from models.question import Question
+from src.models.game_session import GameSession
+from src.models.question import Question
 
 
 @dataclass

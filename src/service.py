@@ -1,16 +1,22 @@
-from managers.game_manager import GameManager, GameSession
-from managers.player_manager import PlayerManager
-from managers.question_manager import QuestionManager, Question
+import deprecation
 
-from config.config import QUESTION_SOURCE
+from config.config import QUESTION_SOURCE, CATEGORIES_SOURCE
+from managers.categories_manager import CategoriesManager
+from managers.game_manager import GameManager
+from managers.player_manager import PlayerManager
+from managers.question_manager import QuestionManager
+from models.game_session import GameSession
 from models.player import Player
+from models.question import Question
 
 
 class QuestroMainService:
-
-    game_manager = GameManager()
+    # создаем все менеджеры
     player_manager = PlayerManager()
+    categories_manager = CategoriesManager(path=CATEGORIES_SOURCE)
     question_manager = QuestionManager(path=QUESTION_SOURCE)
+
+    game_manager = GameManager(question_manager=question_manager)
 
     # Создаем пользователя при присоединении к игре
 
@@ -27,10 +33,10 @@ class QuestroMainService:
     # Создаем игру по запросу пользователя
 
     @classmethod
-    def create_game(cls, player_sid: str) -> GameSession:
+    def create_game(cls, player_sid: str, cat: str = "default") -> GameSession:
         """Стартует игру, возврашает игру"""
         player = cls.player_manager.get_player_by_pk(sid=player_sid)
-        game = cls.game_manager.start_game()
+        game = cls.game_manager.start_game(cat=cat)
         cls.game_manager.add_player_to_game(player, game)
         return game
 
@@ -60,25 +66,28 @@ class QuestroMainService:
 
     #### Вопросы ####
 
-    @classmethod
-    def get_next_question(cls, game, player) -> Question:
-        """ Дает игроку вопрос """
-        question: Question = cls.question_manager.get_random()
-        return question
+    # @classmethod
+    # def get_next_question(cls, game, player) -> Question:
+    #     """ Дает игроку вопрос """
+    #     # question: Question = cls.question_manager.get_random()
+    #     question
+    #     return question
 
     @classmethod
     def get_three_questions(cls, game, player) -> list[Question]:
         """ Возвращает три вопросика"""
-        questions: list[Question] = cls.question_manager.get_random_three()
+        # questions: list[Question] = cls.question_manager.get_random_three()
+        questions: list[Question] = game.get_three_randoms()
         return questions
-
 
     @classmethod
     def get_question_by_pk(cls, pk) -> Question:
+        """Возвращаем вопрос по его номеру"""
         question = cls.question_manager.get_by_pk(pk)
         return question
 
     @classmethod
+    @deprecation.deprecated()
     def record_answer(cls, sid, pk):
 
         question = cls.get_question_by_pk(pk)
@@ -87,8 +96,14 @@ class QuestroMainService:
 
         return player
 
+    ### Работаем с категориями
 
-    # Заканчиваем играть
+    @classmethod
+    def get_categories(cls):
+        all_categories = cls.categories_manager.get_all()
+        return [cat.dict() for cat in all_categories]
+
+    ### Заканчиваем играть
 
     @classmethod
     def finish_game(cls, game_pk):
@@ -111,5 +126,3 @@ class QuestroMainService:
         next_player = game.get_next_player(player)
 
         return next_player
-
-

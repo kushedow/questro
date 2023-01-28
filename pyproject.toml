@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "src"
+version = "0.2.1"
+description = "social game"
+authors = ["Gleb Kushedow <kushedow@gmail.com>"]
+license = "Attribution-NonCommercial 3.0 Unported"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+eventlet = "^0.33.3"
+python-socketio = "*"
+deprecation = "^2.1.0"
+
+[tool.poetry.scripts]
+run = "src.run:main"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

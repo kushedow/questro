@@ -1,18 +1,17 @@
 import eventlet
 
 import logging
-import config.logger
 
-from managers.game_manager import GameSession
-from managers.player_manager import Player
-from models.question import Question
+from src.models.game_session import GameSession
+from src.models.player import Player
+from src.models.question import Question
 
-from service import QuestroMainService as service
+from src.service import QuestroMainService as service
 
 # Выносим в отдельный файл создание сокета,
 # чтобы иметь возможность разделить контроллер на несколько
 
-from create_socket import sio, app
+from src.create_socket import sio, app
 
 # Активируем логгер для сокета
 socket_logger = logging.getLogger("socket")
@@ -26,7 +25,8 @@ def update_game_by_player_id(sid):
     player: Player = service.get_player_by_sid(sid)
     game: GameSession = player.get_game()
 
-    player_ids = [player.sid for player in game.players_as_list]
+    # TODO ограничить информацию по игровой сессии
+    # player_ids = [player.sid for player in game.players_as_list]
 
     sio.emit("client/game_updated", data=game.dict())
 
@@ -49,15 +49,22 @@ def connect(sid, environ):
 
 @sio.on('server/create_game')
 def socket_start_game(sid, data):
+
     socket_logger.info(f"START GAME {sid}")
 
-    game: GameSession = service.create_game(player_sid=sid)
+    # Создаем игровую сессию с указанной темой
+    game: GameSession = service.create_game(
+        player_sid=sid,
+        cat=data.get("cat", "default")
+    )
+
+    # Отправляем информацию об игре создателю
     game_as_dict = game.dict()
     sio.emit("client/game_updated", to=sid, data=game_as_dict)
 
 
 # >> server/join_game
-# << client/client/game_updated
+# << client/game_updated
 
 @sio.on('server/join_game')
 def socket_join(sid, data):
@@ -70,7 +77,7 @@ def socket_join(sid, data):
         socket_exception(sid, "No game was found")
         return
 
-    sio.emit("client/game_updated", to=sid, data=game.dict())
+    # sio.emit("client/game_updated", to=sid, data=game.dict())
 
     update_game_by_player_id(sid)
 
@@ -100,7 +107,7 @@ def socket_join(sid, data):
 # >> server/get_questions
 # << client/get_questions
 @sio.on('server/get_questions')
-def socket_get_question(sid, data):
+def socket_get_questions(sid, data):
     socket_logger.info(f"GET QUESTION {sid} {data}")
 
     player: Player = service.get_player_by_sid(sid)
@@ -111,6 +118,7 @@ def socket_get_question(sid, data):
         return
 
     questions: list[Question] = service.get_three_questions(game, player)
+
     sio.emit("client/get_questions", to=sid, data=[que.dict() for que in questions])
 
 
@@ -118,6 +126,7 @@ def socket_get_question(sid, data):
 # << client/receive_question
 @sio.on('server/pick_question')
 def socket_get_question(sid, data):
+
     socket_logger.info(f"PICK QUESTION {sid}")
 
     player: Player = service.get_player_by_sid(sid)
@@ -136,9 +145,19 @@ def socket_get_question(sid, data):
 
     next_player_sid: str = next_player.sid
 
-    print("sending question", question_pk, "from", player.sid, "to", next_player_sid)
+    # print("sending question", question_pk, "from", player.sid, "to", next_player_sid)
 
     sio.emit("client/receive_question", to=next_player_sid, data=question.dict())
+
+
+# >> server/get_categories
+# >> client/get_categories
+@sio.on("server/get_categories")
+def socket_get_categories(sid, data):
+    """ Возвращает список категорий """
+    socket_logger.info(f"GET CATEGORIES {sid}")
+    categories = service.get_categories()
+    sio.emit("client/get_categories", to=sid, data=categories)
 
 
 @sio.event
@@ -147,6 +166,7 @@ def disconnect(sid):
 
     player = service.get_player_by_sid(sid)
     game = player.game
+
     if game:
         service.remove_player_from_game(player, game)
 
@@ -175,16 +195,23 @@ def socket_exception(sid: str, error: str, broadcast=False):
 
     if not broadcast:
         sio.emit("client/exception", to=sid, data={"error": error})
+
     else:
         player = service.get_player_by_sid(sid)
         game = player.game
-        all_players = game.players
 
-        for player_to_inform in all_players:
-            sio.emit("client/exception", to=player_to_inform, data={"error": error})
+        if game is not None:
+
+            for player_to_inform in game.players:
+                sio.emit("client/exception", to=player_to_inform, data={"error": error})
 
 
-if __name__ == '__main__':
+
+def main():
     eventlet.wsgi.server(
         eventlet.listen(('', 80)), app
     )
+
+
+if __name__ == '__main__':
+    main()
