@@ -29,8 +29,8 @@ import {io} from "socket.io-client";
 import {router} from "@/router";
 
 const count = ref(0)
-// const socket_server_url = "ws://188.68.222.147"
-const socket_server_url = "ws://0.0.0.0"
+const socket_server_url = "ws://188.68.222.147"
+// const socket_server_url = "ws://0.0.0.0"
 
 export default {
 
