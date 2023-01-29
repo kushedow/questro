@@ -32,15 +32,22 @@ export default {
   },
 
   computed: {
+    // код присоединения к игре
     code() {return this.$root.$data.code},
-    players() {return this.$root.$data.players}
+    // игроки в текущей игровой сессии
+    players() {return this.$root.$data.players},
+    // выбранная категория
+    current_category() {return this.$root.$data.current_category},
   },
 
   mounted() {
     console.log("APP: отправляем запрос над создание игры")
 
+    // заказываем категории
+    this.socket.emit("server/get_categories", {})
+
     // отправляем запрос на создание игры
-    this.socket.emit("server/create_game", {})
+    this.socket.emit("server/create_game", {cat: this.current_category})
 
     // обозначаем, что в игре мы отвечаем первыми
     this.$root.$data.leading = true

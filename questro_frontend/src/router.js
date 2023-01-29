@@ -12,6 +12,7 @@ import WaitForAnswerPage from "@/components/WaitForAnswerPage.vue";
 
 
 import App from "@/App.vue";
+import PickCategoryPage from "@/components/PickCategoryPage.vue";
 
 export const router = new createRouter({
     history: createWebHashHistory(),
@@ -20,19 +21,29 @@ export const router = new createRouter({
         // Страница меню
         { path: '/', component: MainMenuPage },
 
+        // Категории вопросов
+        { path: '/categories', component: PickCategoryPage },
+
         // Создаем игру
         { path: '/create', component: CreatePage },
+
         // Присоединяемся к игре
         { path: '/join', component: JoinPage },
+
         // Показываем результаты
         { path: '/results', component: ResultsPage },
 
+        // В процессе игры
+
         // Выбрать страничку
         { path: '/pickquestion', component: PickQuestionsPage },
+
         // Ожидаем вопрос
         { path: '/waitforpick', component: WaitForPickPage },
+
         // Ожидаем ответ
         { path: '/waitforanswer', component: WaitForAnswerPage },
+
         // Отвечаем на вопрос
         { path: '/answerquestion', component: AnswerQuestionPage },
 

@@ -35,4 +35,3 @@ class Player:
 
         return result
 
-

@@ -84,6 +84,8 @@ def socket_join(sid, data):
 def socket_get_questions(sid, data):
     socket_logger.info(f"GET QUESTION {sid} {data}")
 
+    print(f"GET QUESTION {sid} {data}")
+
     player: Player = service.get_player_by_sid(sid)
 
     game: GameSession = player.game
