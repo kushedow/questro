@@ -77,7 +77,8 @@ class GameSession:
         self.questions_category = cat_name
 
     def remove_question(self, question_pk):
-        self.questions.pop(question_pk)
+        if question_pk in self.questions:
+            self.questions.pop(question_pk)
 
     def get_three_randoms(self) -> list[Question]:
         """ Возвращает три вопроса, если есть, если нет – None"""

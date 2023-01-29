@@ -46,7 +46,6 @@ def connect(sid, environ):
 
 # >> server/create_game
 # << client/game_created
-
 @sio.on('server/create_game')
 def socket_start_game(sid, data):
 
@@ -65,7 +64,6 @@ def socket_start_game(sid, data):
 
 # >> server/join_game
 # << client/game_updated
-
 @sio.on('server/join_game')
 def socket_join(sid, data):
     socket_logger.info(f"JOIN GAME {sid}")
@@ -77,32 +75,8 @@ def socket_join(sid, data):
         socket_exception(sid, "No game was found")
         return
 
-    # sio.emit("client/game_updated", to=sid, data=game.dict())
-
+    # оповещаем всех участников игры о таком счастье
     update_game_by_player_id(sid)
-
-
-# >> server/record_answer
-# << client/answer_recorded
-
-# @sio.on('server/record_answer')
-# def socket_answer(sid, data):
-#
-#     pk = int(data['pk'])
-#     player = service.record_answer(sid, pk)
-#     result = player.dict()
-#
-#     sio.emit("client/answer_recorded", to=sid, data=result)
-#
-#     # Теперь подберем вопрос для следующего пользователя
-#
-#     game = player.game
-#     next_player = game.get_next_player(player)
-#     question = service.get_next_question(game, player)
-#
-#     result: Question = question.dict()
-#     sio.emit("client/answer_recorded", to=next_player.sid, data=result)
-
 
 # >> server/get_questions
 # << client/get_questions
@@ -127,22 +101,23 @@ def socket_get_questions(sid, data):
 @sio.on('server/pick_question')
 def socket_get_question(sid, data):
 
-    socket_logger.info(f"PICK QUESTION {sid}")
-
-    player: Player = service.get_player_by_sid(sid)
+    # Сперва проверяем что номер вопроса на борту
     question_pk: int = data.get("pk")
-
-    game: GameSession = player.game
-
-    if not game: socket_exception(sid, "no game selected"); return
     if not question_pk: socket_exception(sid, "no question_pk selected"); return
+    socket_logger.info(f"PICK QUESTION {question_pk} for user {sid}")
 
-    question:Question = service.get_question_by_pk(question_pk)
+    # Получаем игровую сессию
+    player: Player = service.get_player_by_sid(sid)
+    game: GameSession = player.game
+    if not game: socket_exception(sid, "no game selected"); return
 
+    # Получаем вопрос и сразу удаляем его из базы вопросов игры
+    question:Question = service.pop_question_from_game(player, question_pk)
+    if not question: socket_exception(sid, f"cant get question {question_pk} from game"); return
+
+    # Пытаемся получить следующего игрока
     next_player: Player = service.get_next_player(game, player)
-
     if not next_player: socket_exception(sid, "no next player found"); return
-
     next_player_sid: str = next_player.sid
 
     # print("sending question", question_pk, "from", player.sid, "to", next_player_sid)
