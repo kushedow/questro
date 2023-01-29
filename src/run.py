@@ -208,7 +208,6 @@ def socket_exception(sid: str, error: str, broadcast=False):
                 sio.emit("client/exception", to=player_to_inform, data={"error": error})
 
 
-
 def main():
     eventlet.wsgi.server(
         eventlet.listen(('', 80)), app
