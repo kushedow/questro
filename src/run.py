@@ -162,6 +162,8 @@ def socket_get_categories(sid, data):
 
 @sio.event
 def disconnect(sid):
+
+    print(f"DISCONNECTED {sid}")
     socket_logger.info(f"DISCONNECTED {sid}")
 
     player = service.get_player_by_sid(sid)
