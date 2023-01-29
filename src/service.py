@@ -54,7 +54,7 @@ class QuestroMainService:
             return None
 
         game = cls.game_manager.add_player_to_game(player, game)
-        print(game)
+
 
         if game:
             return game

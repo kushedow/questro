@@ -30,19 +30,21 @@ export default {
   methods: {
 
     // обновяем код
-    setCode(code_v){
-      this.code = code_v
+    setCode(new_code){
+      this.code = new_code
     },
 
     // обновляем игрока
-    setPlayers(players_v) {     // меняем код подключения
-      this.players = players_v
-      this.$forceUpdate()
+    setPlayers(new_players) {
+      this.players = new_players
+      //this.$forceUpdate()
     },
 
-    startRound(){
+    // обновляем категории (обычно при подключении к игре)
+    setCategories(categories){
+      this.categories = categories
+    },
 
-    }
 
   },
 
@@ -57,10 +59,14 @@ export default {
       leading: false,
       round: 0,
 
+      categories: [],
+
       current_question: "____"
 
     }
   },
+
+
 
   mounted(){
 
@@ -70,45 +76,52 @@ export default {
     // Создаем сокет
     this.socket = io(socket_server_url);
 
-    // Присоединились
+    // КОГДА ПРИСОЕДИНИЛИСЬ
+
     this.socket.on("connect", () => {
 
       this.is_connected = true
       this.socket.emit("server/create_game", {})
 
       console.log("APP: SOCKET connected")
+
+      router.push("/")
+
+
     });
 
-    // Отсоединились
+    // КОГДА ДИСКОННЕКТ
+
     this.socket.on("disconnect", () => {
       this.is_connected = false
       console.log("APP: SOCKET disconnected")
     });
 
-    // Вызвали ошибку client/exception
+    // КОГДА ПРОИЗОШЛА ОШИБКА
+
     this.socket.on('client/exception', function (received_data) {
 
       alert(received_data.error)
 
     });
 
-    // Обрабатываем ответ с игрой от сервера
+    // КОГДА ИГРА ОБНОВЛЕНА
+
     this.socket.on('client/game_updated', function (received_data) {
 
-      console.log("APP:SOCKET client/game_updated")
+      console.log("APP: SOCKET client/game_updated")
 
       // запоминаем код и игроков
       self.setCode(received_data.code)
       self.setPlayers(received_data.players)
 
-
-      console.log(received_data)
+      //console.log(received_data)
 
       self.$forceUpdate();
 
       //  как только набралось два игрока – начинаем играть
 
-      if (self.players.length == 2) {
+      if (self.players.length === 2) {
 
         if (self.leading) {
           router.push('/pickquestion');
@@ -122,9 +135,11 @@ export default {
 
     });
 
+    // КОГДА ВОПРОС ПОЛУЧЕН
+
     this.socket.on('client/receive_question', function (received_data){
 
-      console.log("APP:SOCKET client/receive_question", received_data)
+      console.log("APP: SOCKET client/receive_question", received_data)
 
       self.current_question = received_data.text
 
@@ -139,19 +154,27 @@ export default {
 
 </script>
 
-<style>
+<style lang="sass">
 
-    body {
-      background-color: #222;
-    }
+    body
+      background-color: #222
 
-    .main-container {
-      background-color: #eee;
-      width: 420px;
-      padding: 16px;
-      margin: 2rem auto 2rem;
-      border: 1px solid #eee;
-      border-radius: 8px;
-    }
+    .main-container
+      background-color: #eee
+      width: 420px
+      padding: 16px
+      margin: 2rem auto 2rem
+      border: 1px solid #eee
+      border-radius: 8px
+
+      .status
+        position: relative
+
+        .badge
+          position: absolute
+          right: 0
+          top: 0
+
+
 
 </style>
