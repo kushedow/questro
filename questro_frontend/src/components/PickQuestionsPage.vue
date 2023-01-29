@@ -64,6 +64,8 @@ export default {
   mounted(){
 
     self = this
+
+    // Загружаем вопросы, которые тут будем показывать
     this.fetchQuestions()
 
     // Обрабатываем ответ с вопросами
