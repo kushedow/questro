@@ -7,10 +7,10 @@ sio = socketio.Server(cors_allowed_origins="*", origins="*")
 app = socketio.WSGIApp(sio, static_files={
 
         # Разрешаем открывать главную
-        '/': {'content_type': 'text/html', 'filename': 'questro_frontend/dist/index.html'},
+        '/': {'content_type': 'text/html', 'filename': '../questro_frontend/dist/index.html'},
 
         # Разрешаем открывать все из папки ассетов
-        '/assets/': 'questro_frontend/dist/assets/'
+        '/assets/': '../questro_frontend/dist/assets/'
 
     },
 )
