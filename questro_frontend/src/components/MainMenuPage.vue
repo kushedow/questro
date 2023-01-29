@@ -8,8 +8,8 @@
     .list-group.text-center
 
          router-link(to="/create").list-group-item.list-group-item-action Создать
-         router-link(to="join").list-group-item.list-group-item-action Присоединиться
-         router-link(to="play").list-group-item.list-group-item-action Правила
+         router-link(to="/join").list-group-item.list-group-item-action Присоединиться
+         // router-link(to="play").list-group-item.list-group-item-action Правила
          // router-link(to="results").list-group-item.list-group-item-action Результаты
 
     footer.m-3.mt-5.text-center

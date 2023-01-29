@@ -54,7 +54,7 @@ class QuestroMainService:
             return None
 
         game = cls.game_manager.add_player_to_game(player, game)
-        print(game)
+
 
         if game:
             return game
@@ -81,10 +81,27 @@ class QuestroMainService:
         return questions
 
     @classmethod
-    def get_question_by_pk(cls, pk) -> Question:
+    def get_question_by_pk(cls, question_pk) -> Question | None:
         """Возвращаем вопрос по его номеру"""
-        question = cls.question_manager.get_by_pk(pk)
+
+        question = cls.question_manager.get_by_pk(question_pk)
         return question
+
+    @classmethod
+    def pop_question_from_game(cls, player: Player, question_pk: int) -> Question | None:
+        """ Получает вопрос по номеру и удаляет его из игры"""
+
+        # Пытаемся получить игру, ругаемся если не можем
+        game: GameSession = player.game
+        if not game:
+            return None
+
+        # Получаем и удираем вопрос
+        question = cls.get_question_by_pk(question_pk)
+        game.remove_question(question_pk)
+
+        return question
+
 
     @classmethod
     @deprecation.deprecated()
@@ -107,6 +124,7 @@ class QuestroMainService:
 
     @classmethod
     def finish_game(cls, game_pk):
+        # TODO Дописать завершение игры
         """ Завершает игру"""
         pass
 

@@ -10,7 +10,7 @@
 
   form.join-form.m-4.text-center
     input.giant(v-model='code', placeholder='0000').mb-5
-    button(@click='joinGame').btn.btn-lg.btn-dark Мы готовы начать
+    span(@click='joinGame').btn.btn-lg.btn-dark Мы готовы начать!
 
 </template>
 
@@ -31,7 +31,6 @@ export default {
   methods: {
 
     joinGame(){
-      //console.log(this.socket.emit)
 
       this.socket.emit("server/join_game", {code: parseInt(this.code)})
       console.log("APP: отправляем запрос на присоедниение к игре", this.code)

@@ -2,7 +2,7 @@
 
 import QuestionsPage from './components/PickQuestionsPage.vue'
 import MainMenuPage from './components/MainMenuPage.vue'
-import { ref } from 'vue'
+import {ref} from 'vue'
 
 </script>
 
@@ -14,6 +14,11 @@ import { ref } from 'vue'
   RouterView
   footer.text-center
 
+.debug.text-center
+  span leading:{{leading}}
+  span code:{{code}}
+  span players:{{players.length}}
+
 
 </template>
 
@@ -24,25 +29,27 @@ import {router} from "@/router";
 
 const count = ref(0)
 const socket_server_url = "ws://188.68.222.147"
+// const socket_server_url = "ws://0.0.0.0"
 
 export default {
 
   methods: {
 
     // обновяем код
-    setCode(code_v){
-      this.code = code_v
+    setCode(new_code) {
+      this.code = new_code
     },
 
     // обновляем игрока
-    setPlayers(players_v) {     // меняем код подключения
-      this.players = players_v
-      this.$forceUpdate()
+    setPlayers(new_players) {
+      this.players = new_players
     },
 
-    startRound(){
+    // обновляем категории (обычно при подключении к игре)
+    setCategories(categories) {
+      this.categories = categories
+    },
 
-    }
 
   },
 
@@ -50,19 +57,22 @@ export default {
     return {
 
       socket: {},  // объект доступа к сокету
-      code : "____",   // код присоединения к игре
+      code: "____",   // код присоединения к игре
       is_connected: false, // подсоединен ли сокет
 
       players: [], // список игроков в нашей группе
       leading: false,
       round: 0,
 
+      categories: [],
+
       current_question: "____"
 
     }
   },
 
-  mounted(){
+
+  mounted() {
 
     // создаем прокси для методов
     const self = this
@@ -70,45 +80,48 @@ export default {
     // Создаем сокет
     this.socket = io(socket_server_url);
 
-    // Присоединились
+    // КОГДА ПРИСОЕДИНИЛИСЬ
+
     this.socket.on("connect", () => {
 
       this.is_connected = true
-      this.socket.emit("server/create_game", {})
+
+      router.push("/")
 
       console.log("APP: SOCKET connected")
+
     });
 
-    // Отсоединились
+    // КОГДА ДИСКОННЕКТ
+
     this.socket.on("disconnect", () => {
       this.is_connected = false
       console.log("APP: SOCKET disconnected")
+      alert("APP: DISCONNECTED")
     });
 
-    // Вызвали ошибку client/exception
+    // КОГДА ПРОИЗОШЛА ОШИБКА
+
     this.socket.on('client/exception', function (received_data) {
 
       alert(received_data.error)
 
     });
 
-    // Обрабатываем ответ с игрой от сервера
+    // КОГДА ИГРА ОБНОВЛЕНА
+
     this.socket.on('client/game_updated', function (received_data) {
 
-      console.log("APP:SOCKET client/game_updated")
+      console.log("APP: SOCKET client/game_updated")
 
       // запоминаем код и игроков
       self.setCode(received_data.code)
       self.setPlayers(received_data.players)
 
-
-      console.log(received_data)
-
-      self.$forceUpdate();
-
       //  как только набралось два игрока – начинаем играть
+      //  но если есть код можно присоединиться еще игрокам
 
-      if (self.players.length == 2) {
+      if (self.players.length >= 2) {
 
         if (self.leading) {
           router.push('/pickquestion');
@@ -117,19 +130,20 @@ export default {
         }
 
         console.log("APP: 2 players detected, game starts")
-
       }
 
     });
 
-    this.socket.on('client/receive_question', function (received_data){
+    // КОГДА ВОПРОС ПОЛУЧЕН
 
-      console.log("APP:SOCKET client/receive_question", received_data)
+    this.socket.on('client/receive_question', function (received_data) {
+
+      console.log("APP: SOCKET client/receive_question", received_data)
 
       self.current_question = received_data.text
 
       router.push("answerquestion")
-      self.round ++
+      self.round++
 
     })
 
@@ -139,19 +153,28 @@ export default {
 
 </script>
 
-<style>
+<style lang="sass">
 
-    body {
-      background-color: #222;
-    }
+body
+  background-color: #222
 
-    .main-container {
-      background-color: #eee;
-      width: 420px;
-      padding: 16px;
-      margin: 2rem auto 2rem;
-      border: 1px solid #eee;
-      border-radius: 8px;
-    }
+.main-container
+  background-color: #eee
+  width: 420px
+  padding: 16px
+  margin: 2rem auto 2rem
+  border: 1px solid #eee
+  border-radius: 8px
+
+  .status
+    position: relative
+
+    .badge
+      position: absolute
+      right: 0
+      top: 0
+
+.debug
+  color: #888
 
 </style>

@@ -1,7 +1,7 @@
 <template lang="pug">
 .answer-question
   header.text-center.m-4
-    a(href="/").mr-3 Назад
+    router-link(to="/").mr-3 Назад
     span &nbsp;&nbsp;&nbsp;&nbsp;
     span.ml-3 Раунд {{round}}
   .card.mt-5

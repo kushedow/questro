@@ -12,7 +12,7 @@
 
   .actions.text-center.mt-5.mb-4
 
-    router-link(to="/play", v-if="players.length==2").btn.btn-dark.btn-lg Начать
+    router-link(to="/pickquestion", v-if="players.length==2").btn.btn-dark.btn-lg Начать
 
 </template>
 
