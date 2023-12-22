@@ -15,9 +15,10 @@ import {ref} from 'vue'
   footer.text-center
 
 .debug.text-center
-  span leading:{{leading}}
-  span code:{{code}}
-  span players:{{players.length}}
+  span leading:{{leading}} /&nbsp;
+  span code:{{code}} /&nbsp;
+  span players:{{players.length}} /&nbsp;
+  span cat:{{current_category}}
 
 
 </template>
@@ -65,6 +66,7 @@ export default {
       round: 0,
 
       categories: [],
+      current_category: "default",
 
       current_question: "____"
 
@@ -144,6 +146,17 @@ export default {
 
       router.push("answerquestion")
       self.round++
+
+    })
+
+    // КОГДА ПОЛУЧЕН СПИСОК КАТЕГОРИЙ
+
+    this.socket.on('client/get_categories', function (received_data) {
+
+      console.log("APP: SOCKET client/get_categories", received_data)
+
+      // сохраняем полученные вопросы
+      self.setCategories(received_data)
 
     })
 

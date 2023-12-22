@@ -35,6 +35,9 @@ class QuestroMainService:
     @classmethod
     def create_game(cls, player_sid: str, cat: str = "default") -> GameSession:
         """Стартует игру, возврашает игру"""
+
+        print(f"GAME CREATION player {player_sid}, {cat}")
+
         player = cls.player_manager.get_player_by_pk(sid=player_sid)
         game = cls.game_manager.start_game(cat=cat)
         cls.game_manager.add_player_to_game(player, game)
